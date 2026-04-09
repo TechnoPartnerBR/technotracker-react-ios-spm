@@ -1,4 +1,4 @@
-# TechnoTracker React iOS SPM
+# TechnoTracker React iOS
 
 Distribuição via Swift Package Manager do **TechnoTrackerReact** — módulo nativo iOS para integração do TechnoTracker SDK em aplicativos React Native.
 
@@ -46,12 +46,145 @@ password <sua-senha>
 
 Solicite credenciais à TechnoPartner.
 
+## Quick Start
+
+1. Adicione o pacote `TechnoTrackerReact` como dependência SPM no projeto.
+
+2. No método `application(_:didFinishLaunchingWithOptions:)` da classe `AppDelegate`, adicione a seguinte linha:
+
+> Ao inicializar, o módulo imprime sua versão no console: `[TechnoTrackerReact] version X.Y.Z`.
+
+```swift
+TechnoTrackerReact.shared.initialize()
+```
+
+3. Implemente a classe `TechnoTrackerModule` no app host e registre-a no `ReactPackage` da aplicação, conforme o passo a passo em [iOS Native Modules](https://reactnative.dev/docs/native-modules-ios).
+
+4. Pronto! Agora é só utilizar as funções do módulo no *JavaScript* do aplicativo.
+
+### Exemplo — AppDelegate
+
+```swift
+func application(
+    _ application: UIApplication,
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+) -> Bool {
+    // ...
+
+    /** TECHNOTRACKER integration: copy and paste this line into your own
+     * AppDelegate application(_:didFinishLaunchingWithOptions:) method. */
+    TechnoTrackerReact.shared.initialize()
+
+    return true
+}
+```
+
+### Implementação do TechnoTrackerModule
+
+O app host deve criar dois arquivos para expor o módulo ao JavaScript:
+
+**TechnoTrackerModule.swift**
+
+```swift
+import TechnoTrackerReact
+
+@objc(TechnoTrackerModule)
+class TechnoTrackerModule: NSObject {
+
+    @objc(create:)
+    func create(_ sdkToken: String) {
+        TechnoTrackerReact.shared.initialize(token: sdkToken)
+    }
+
+    @objc(createAntennaId:)
+    func createAntennaId(_ token: String) {
+        Task { await TechnoTrackerReact.shared.registerAntennaID(seed: token) }
+    }
+
+    @objc func start() { TechnoTrackerReact.shared.start() }
+
+    @objc func stop()  { TechnoTrackerReact.shared.stop()  }
+
+    @objc static func requiresMainQueueSetup() -> Bool { false }
+}
+```
+
+**TechnoTrackerModule.m**
+
+```objc
+#import <React/RCTBridgeModule.h>
+
+@interface RCT_EXTERN_MODULE(TechnoTrackerModule, NSObject)
+RCT_EXTERN_METHOD(create:(NSString *)sdkToken)
+RCT_EXTERN_METHOD(createAntennaId:(NSString *)token)
+RCT_EXTERN_METHOD(start)
+RCT_EXTERN_METHOD(stop)
+@end
+```
+
+## Pré-requisitos do SDK
+
+### Background Modes
+
+O TechnoTracker SDK requer que o app host declare os *background modes* necessários no `Info.plist`. No Xcode: **target → Signing & Capabilities → + Capability → Background Modes**.
+
+| Mode | Chave `Info.plist` | Descrição |
+|------|--------------------|-----------|
+| Location updates | `location` | Mantém o processo vivo em background via `CLLocationManager`. Estratégia principal do SDK para executar scanning BLE contínuo. |
+| Uses Bluetooth LE accessories | `bluetooth-central` | Scanning BLE em background com State Restoration. Permite que o iOS relance o app automaticamente ao detectar um dispositivo IoTracker conhecido. |
+
+### Permissões de Privacidade
+
+As seguintes chaves devem estar presentes no `Info.plist` do app host com uma descrição adequada ao contexto da aplicação:
+
+| Chave | Obrigatória | Descrição |
+|-------|-------------|-----------|
+| `NSLocationAlwaysAndWhenInUseUsageDescription` | Sim | Exibida ao solicitar localização em modo *Always*. O SDK requer `authorizedAlways` para funcionar em background. |
+| `NSLocationWhenInUseUsageDescription` | Sim | Exigida pelo iOS junto com a chave *Always* no fluxo de autorização de localização. |
+| `NSBluetoothAlwaysUsageDescription` | Sim | Exibida ao inicializar o `CBCentralManager`. O acesso Bluetooth é necessário para a detecção de dispositivos IoTracker. |
+
+### Autorização em tempo de execução
+
+O app host é responsável por solicitar as permissões ao usuário antes de chamar `TechnoTrackerModule.start()`:
+
+- **Localização:** deve ser solicitada com nível *Always* (`requestAlwaysAuthorization`). O SDK não opera corretamente com *When In Use* apenas.
+- **Bluetooth:** autorização solicitada automaticamente pelo sistema na primeira inicialização do `CBCentralManager`.
+
+## TechnoTrackerModule (JavaScript)
+
+Os métodos do módulo são acessados via JavaScript na aplicação ([testing native modules](https://reactnative.dev/docs/native-modules-ios#test-what-you-have-built)). Para inicializar o SDK pela primeira vez, com a chave de API fornecida pela TechnoPartner, invoque o método `create`:
+
+```javascript
+TechnoTrackerModule.create('sdk-api-token');
+```
+
+Uma vez inicializado, invoque `start` para que o SDK realize suas funções:
+
+```javascript
+TechnoTrackerModule.start();
+```
+
+**Nota**: Mesmo inicializado, o SDK permanecerá "dormente" até que a função `start` seja invocada.
+
+Para parar a execução do SDK:
+
+```javascript
+TechnoTrackerModule.stop();
+```
+
+Por fim, registre um ID único para o SDK fornecendo uma *seed* única no contexto do aplicativo — por exemplo: e-mail/login do usuário, um ID interno do app, etc.
+
+```javascript
+TechnoTrackerModule.createAntennaId('seed-minha-claro');
+```
+
+### Fluxo de inicialização
+
+É recomendado que a inicialização do SDK, utilizando `TechnoTrackerModule.create` e `TechnoTrackerModule.start`, seja feita logo na inicialização do aplicativo, antes mesmo do login do usuário. Isso garante que o SDK irá executar durante todo o ciclo de vida da aplicação.
+
 ## Versões disponíveis
 
 | Versão | Release | Notas |
 |--------|---------|-------|
 | 1.0.0  | 2026-04-07 | Versão inicial |
-
-## Documentação
-
-Veja [technotracker-react](https://github.com/TechnoPartnerBR/technotracker-react) para documentação completa do módulo, API JavaScript e integração com React Native.
+| 2.1.0  | 2026-04-09 | Scripts de build e upload para distribuição via SPM |
