@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "TechnoTrackerReact",
     platforms: [
-        .iOS(.v15)
+        .iOS(.v14)
     ],
     products: [
         .library(
@@ -16,8 +16,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "TechnoTrackerReact",
-            url: "https://spm-sdk.technopartner.com.br/TechnoTrackerReact/2.1.0/TechnoTrackerReact.xcframework.zip",
-            checksum: "3142107783e0bad9f47a362d31f52672990eaccf189998a0c6eb3893994dee97"
+            url: "https://spm-sdk.technopartner.com.br/TechnoTrackerReact/2.1.1/TechnoTrackerReact.xcframework.zip",
+            checksum: "917f27111cdfb3a1b0df7cce44aafe94ca88d8115e036bf0c0f4eca6c41874f4"
         ),
     ]
 )

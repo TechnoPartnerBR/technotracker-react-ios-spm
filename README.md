@@ -188,3 +188,4 @@ TechnoTrackerModule.createAntennaId('seed-minha-claro');
 |--------|---------|-------|
 | 1.0.0  | 2026-04-07 | Versão inicial |
 | 2.1.0  | 2026-04-09 | Scripts de build e upload para distribuição via SPM |
+| 2.1.1  | 2026-04-10 | Minimum iOS deployment target lowered from 15.0 to 14.0 |
