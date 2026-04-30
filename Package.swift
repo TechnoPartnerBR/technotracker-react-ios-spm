@@ -10,14 +10,27 @@ let package = Package(
     products: [
         .library(
             name: "TechnoTrackerReact",
-            targets: ["TechnoTrackerReact"]
+            targets: ["TechnoTrackerReact", "TechnoTrackerReactDependencies"]
         ),
+    ],
+    dependencies: [
+        .package(
+            url: "https://github.com/TechnoPartnerBR/technotracker-ios-spm",
+            branch: "main"
+        )
     ],
     targets: [
         .binaryTarget(
             name: "TechnoTrackerReact",
             url: "https://spm-sdk.technopartner.com.br/TechnoTrackerReact/2.1.1/TechnoTrackerReact.xcframework.zip",
             checksum: "917f27111cdfb3a1b0df7cce44aafe94ca88d8115e036bf0c0f4eca6c41874f4"
+        ),
+        .target(
+            name: "TechnoTrackerReactDependencies",
+            dependencies: [
+                .product(name: "IoTracker", package: "technotracker-ios-spm")
+            ],
+            path: "Sources/TechnoTrackerReactDependencies"
         ),
     ]
 )
