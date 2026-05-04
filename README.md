@@ -105,7 +105,70 @@ class TechnoTrackerModule: NSObject {
 
     @objc func stop()  { TechnoTrackerReact.shared.stop()  }
 
+    @objc(checkLocationPermission:rejecter:)
+    func checkLocationPermission(_ resolve: @escaping RCTPromiseResolveBlock,
+                                  rejecter reject: @escaping RCTPromiseRejectBlock) {
+        Task {
+            do {
+                let status = try await TechnoTrackerReact.shared.checkLocationPermission()
+                resolve(status.bridgeValue)
+            } catch {
+                reject("E_PERMISSION", error.localizedDescription, error)
+            }
+        }
+    }
+
+    @objc(requestLocationPermission:rejecter:)
+    func requestLocationPermission(_ resolve: @escaping RCTPromiseResolveBlock,
+                                    rejecter reject: @escaping RCTPromiseRejectBlock) {
+        Task {
+            do {
+                let status = try await TechnoTrackerReact.shared.requestLocationPermission()
+                resolve(status.bridgeValue)
+            } catch {
+                reject("E_PERMISSION", error.localizedDescription, error)
+            }
+        }
+    }
+
+    @objc(checkBluetoothPermission:rejecter:)
+    func checkBluetoothPermission(_ resolve: @escaping RCTPromiseResolveBlock,
+                                   rejecter reject: @escaping RCTPromiseRejectBlock) {
+        Task {
+            do {
+                let status = try await TechnoTrackerReact.shared.checkBluetoothPermission()
+                resolve(status.bridgeValue)
+            } catch {
+                reject("E_PERMISSION", error.localizedDescription, error)
+            }
+        }
+    }
+
+    @objc(requestBluetoothPermission:rejecter:)
+    func requestBluetoothPermission(_ resolve: @escaping RCTPromiseResolveBlock,
+                                     rejecter reject: @escaping RCTPromiseRejectBlock) {
+        Task {
+            do {
+                let status = try await TechnoTrackerReact.shared.requestBluetoothPermission()
+                resolve(status.bridgeValue)
+            } catch {
+                reject("E_PERMISSION", error.localizedDescription, error)
+            }
+        }
+    }
+
     @objc static func requiresMainQueueSetup() -> Bool { false }
+}
+
+private extension PermissionStatus {
+    var bridgeValue: String {
+        switch self {
+        case .granted:       return "granted"
+        case .denied:        return "denied"
+        case .restricted:    return "restricted"
+        case .pendingAction: return "pendingAction"
+        }
+    }
 }
 ```
 
@@ -119,6 +182,10 @@ RCT_EXTERN_METHOD(create:(NSString *)sdkToken)
 RCT_EXTERN_METHOD(createAntennaId:(NSString *)token)
 RCT_EXTERN_METHOD(start)
 RCT_EXTERN_METHOD(stop)
+RCT_EXTERN_METHOD(checkLocationPermission:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(requestLocationPermission:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(checkBluetoothPermission:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(requestBluetoothPermission:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 @end
 ```
 
@@ -145,10 +212,10 @@ As seguintes chaves devem estar presentes no `Info.plist` do app host com uma de
 
 ### Autorização em tempo de execução
 
-O app host é responsável por solicitar as permissões ao usuário antes de chamar `TechnoTrackerModule.start()`:
+O app host é responsável por solicitar as permissões ao usuário. O módulo expõe métodos auxiliares para isso — veja a seção [Permissões](#permissões) do TechnoTrackerModule JavaScript.
 
-- **Localização:** deve ser solicitada com nível *Always* (`requestAlwaysAuthorization`). O SDK não opera corretamente com *When In Use* apenas.
-- **Bluetooth:** autorização solicitada automaticamente pelo sistema na primeira inicialização do `CBCentralManager`.
+- **Localização:** o SDK requer `authorizedAlways` para funcionar em background. *When In Use* não é suficiente.
+- **Bluetooth:** autorização solicitada pelo sistema na primeira inicialização do `CBCentralManager`.
 
 ## TechnoTrackerModule (JavaScript)
 
@@ -178,6 +245,20 @@ Por fim, registre um ID único para o SDK fornecendo uma *seed* única no contex
 TechnoTrackerModule.createAntennaId('seed-minha-claro');
 ```
 
+### Permissões
+
+O módulo expõe métodos auxiliares para verificar e solicitar as permissões necessárias. Eles retornam uma Promise com um dos valores: `"granted"`, `"denied"`, `"restricted"` ou `"pendingAction"`.
+
+```javascript
+// Verificar status atual sem exibir diálogo
+const locationStatus = await TechnoTrackerModule.checkLocationPermission();
+const bluetoothStatus = await TechnoTrackerModule.checkBluetoothPermission();
+
+// Solicitar permissão (exibe diálogo do sistema se ainda não determinado)
+const locationStatus = await TechnoTrackerModule.requestLocationPermission();
+const bluetoothStatus = await TechnoTrackerModule.requestBluetoothPermission();
+```
+
 ### Fluxo de inicialização
 
 É recomendado que a inicialização do SDK, utilizando `TechnoTrackerModule.create` e `TechnoTrackerModule.start`, seja feita logo na inicialização do aplicativo, antes mesmo do login do usuário. Isso garante que o SDK irá executar durante todo o ciclo de vida da aplicação.
@@ -190,3 +271,4 @@ TechnoTrackerModule.createAntennaId('seed-minha-claro');
 | 2.1.0  | 2026-04-09 | Scripts de build e upload para distribuição via SPM |
 | 2.1.1  | 2026-04-10 | Minimum iOS deployment target lowered from 15.0 to 14.0 |
 | 2.1.1.1 | 2026-04-30 | Fix missing IoTracker transitive dependency for SPM consumers |
+| 2.1.2  | 2026-05-04 | Métodos de permissão de localização e Bluetooth via FinderManager |
