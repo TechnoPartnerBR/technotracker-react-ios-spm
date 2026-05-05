@@ -272,3 +272,4 @@ const bluetoothStatus = await TechnoTrackerModule.requestBluetoothPermission();
 | 2.1.1  | 2026-04-10 | Minimum iOS deployment target lowered from 15.0 to 14.0 |
 | 2.1.1.1 | 2026-04-30 | Fix missing IoTracker transitive dependency for SPM consumers |
 | 2.1.2  | 2026-05-04 | Métodos de permissão de localização e Bluetooth via FinderManager |
+| 2.1.3  | 2026-05-05 | Fix .swiftinterface compatibility with Swift 6.2.4+ compilers |

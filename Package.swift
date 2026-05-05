@@ -22,8 +22,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "TechnoTrackerReact",
-            url: "https://spm-sdk.technopartner.com.br/TechnoTrackerReact/2.1.2/TechnoTrackerReact.xcframework.zip",
-            checksum: "911d47568b26d52a64d957a6bf02d2210e5b13af4248774ad0c59ae327537f78"
+            url: "https://spm-sdk.technopartner.com.br/TechnoTrackerReact/2.1.3/TechnoTrackerReact.xcframework.zip",
+            checksum: "dbd936932778e65ecb4b9b4b548582d20ff54989559adf69c08eb469e6ef634a"
         ),
         .target(
             name: "TechnoTrackerReactDependencies",
