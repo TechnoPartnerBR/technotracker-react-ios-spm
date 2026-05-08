@@ -263,13 +263,15 @@ const bluetoothStatus = await TechnoTrackerModule.requestBluetoothPermission();
 
 É recomendado que a inicialização do SDK, utilizando `TechnoTrackerModule.create` e `TechnoTrackerModule.start`, seja feita logo na inicialização do aplicativo, antes mesmo do login do usuário. Isso garante que o SDK irá executar durante todo o ciclo de vida da aplicação.
 
-## Versões disponíveis
+## Versões e compatibilidade
 
-| Versão | Release | Notas |
-|--------|---------|-------|
-| 1.0.0  | 2026-04-07 | Versão inicial |
-| 2.1.0  | 2026-04-09 | Scripts de build e upload para distribuição via SPM |
-| 2.1.1  | 2026-04-10 | Minimum iOS deployment target lowered from 15.0 to 14.0 |
-| 2.1.1.1 | 2026-04-30 | Fix missing IoTracker transitive dependency for SPM consumers |
-| 2.1.2  | 2026-05-04 | Métodos de permissão de localização e Bluetooth via FinderManager |
-| 2.1.3  | 2026-05-05 | Fix .swiftinterface compatibility with Swift 6.2.4+ compilers |
+| TechnoTrackerReact | SDK iOS (IoTracker) | Release     | Notas |
+|--------------------|---------------------|-------------|-------|
+| 1.0.0              | 1.0.0               | 2026-04-07  | Versão inicial |
+| 2.1.0              | 2.1.0               | 2026-04-09  | Scripts de build e upload para distribuição via SPM |
+| 2.1.1              | 2.1.1               | 2026-04-10  | Minimum iOS deployment target lowered from 15.0 to 14.0 |
+| 2.1.1.1            | 2.1.1               | 2026-04-30  | Fix missing IoTracker transitive dependency for SPM consumers |
+| 2.1.2              | 2.1.2               | 2026-05-04  | Métodos de permissão de localização e Bluetooth via FinderManager |
+| 2.1.3              | 2.1.3               | 2026-05-05  | Fix .swiftinterface compatibility with Swift 6.2.4+ compilers |
+| 2.1.3.1            | 2.1.3               | 2026-05-05  | Fix `'PermissionStatus' is not a member type of class 'IoTracker.IoTracker'` in host apps |
+| 2.1.4              | 2.1.3               | 2026-05-08  | Version number corrected to 3-level format (X.Y.Z) — Apple App Store rejects 4-level version strings |
