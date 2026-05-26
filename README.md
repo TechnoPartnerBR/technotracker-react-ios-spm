@@ -276,3 +276,4 @@ const bluetoothStatus = await TechnoTrackerModule.requestBluetoothPermission();
 | 2.1.3.1            | 2.1.3               | 2026-05-05  | Fix `'PermissionStatus' is not a member type of class 'IoTracker.IoTracker'` in host apps |
 | 2.1.4              | 2.1.3               | 2026-05-08  | Version number corrected to 3-level format (X.Y.Z) — Apple App Store rejects 4-level version strings |
 | 2.1.5              | 2.1.4               | 2026-05-18  | SDK IoTracker dependency pinned to exact version instead of branch: main |
+| 2.1.6              | 2.1.5               | 2026-05-26  | start()/stop() implementados; logging migrado para os.Logger |
