@@ -16,14 +16,14 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/TechnoPartnerBR/technotracker-ios-spm",
-            exact: "2.1.5"
+            exact: "2.1.6"
         )
     ],
     targets: [
         .binaryTarget(
             name: "TechnoTrackerReact",
-            url: "https://spm-sdk.technopartner.com.br/TechnoTrackerReact/2.1.6/TechnoTrackerReact.xcframework.zip",
-            checksum: "3235cd08e450ee3bfc50c44432f3f6653c42bb5e7225bf6f963ffbba24e0a399"
+            url: "https://spm-sdk.technopartner.com.br/TechnoTrackerReact/2.1.7/TechnoTrackerReact.xcframework.zip",
+            checksum: "328bb088a2774acb6cfabc71b1158d835550c25d116bb2b2af1c11df7eee5362"
         ),
         .target(
             name: "TechnoTrackerReactDependencies",
