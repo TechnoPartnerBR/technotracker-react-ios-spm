@@ -263,6 +263,29 @@ const bluetoothStatus = await TechnoTrackerModule.requestBluetoothPermission();
 
 É recomendado que a inicialização do SDK, utilizando `TechnoTrackerModule.create` e `TechnoTrackerModule.start`, seja feita logo na inicialização do aplicativo, antes mesmo do login do usuário. Isso garante que o SDK irá executar durante todo o ciclo de vida da aplicação.
 
+## Atualização do SDK — limpeza de cache
+
+> **Para integradores.** Leia ao **atualizar** o `TechnoTrackerReact` de uma versão baseada no **SDK IoTracker ≤ 2.1.6** (TechnoTrackerReact ≤ 2.1.7) para uma baseada no **SDK 2.1.7+** (TechnoTrackerReact 2.1.8+). Em integrações novas nada disso é necessário.
+
+A partir do SDK IoTracker 2.1.7 o IoTracker passou a ser **autocontido**: embute suas dependências internas no próprio binário, e o grafo de pacotes do seu app deixa de puxá-las transitivamente. Como o Xcode mantém em cache o resultado da compilação anterior, após o upgrade ele pode reaproveitar um cache que ainda espera as dependências antigas, provocando um erro de build:
+
+```
+error: missing required modules: 'CryptoSwift', 'KeychainSwift', 'RxBluetoothKit', 'RxSwift'
+import IoTracker
+       ^
+```
+
+> Os módulos listados podem variar; o ponto em comum é o erro **"missing required modules"**.
+
+**Solução** (na ordem — os passos 1 e 2 costumam bastar):
+
+1. **Resetar os caches de pacotes** — `File ▸ Packages ▸ Reset Package Caches`. Aguarde o Xcode reresolver.
+2. **Limpar a pasta de build** — `Product ▸ Clean Build Folder` (`⇧⌘K`).
+3. **Limpar o DerivedData** (se persistir) — `Xcode ▸ Settings ▸ Locations ▸ Derived Data` → abra a pasta e apague a do seu projeto. Via terminal: `rm -rf ~/Library/Developer/Xcode/DerivedData/<NomeDoApp>-*`.
+4. **Recompilar** (`⌘B`). O primeiro build pós-limpeza é mais lento.
+
+Após a limpeza, o build conclui sem os avisos de classe Objective-C duplicada (`Class … is implemented in both …`), e o `Package.resolved` do seu app passa a listar apenas o pacote `technotracker-react-ios-spm` — sem as dependências transitivas do SDK.
+
 ## Versões e compatibilidade
 
 | TechnoTrackerReact | SDK iOS (IoTracker) | Release     | Notas |
@@ -278,3 +301,4 @@ const bluetoothStatus = await TechnoTrackerModule.requestBluetoothPermission();
 | 2.1.5              | 2.1.4               | 2026-05-18  | SDK IoTracker dependency pinned to exact version instead of branch: main |
 | 2.1.6              | 2.1.5               | 2026-05-26  | start()/stop() implementados; logging migrado para os.Logger |
 | 2.1.7              | 2.1.6               | 2026-06-26  | Dependência do SDK IoTracker atualizada para 2.1.6 |
+| 2.1.8              | 2.1.7               | 2026-06-26  | SDK IoTracker 2.1.7 autocontido — host não linka mais deps transitivas (fim dos warnings de classe Obj-C duplicada) |
